@@ -1,12 +1,10 @@
 package com.api;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -24,14 +22,25 @@ public class TopicModel {
 			ResultSet rs=stmt.executeQuery(sql);
 			result = new ArrayList<Topic>();
 			while(rs.next()) {
-				result.add(new Topic(rs.getString("id"),rs.getString("name"),rs.getString("description")));
+				result.add(new Topic(rs.getString("id"),rs.getString("name"),rs.getString("description"),rs.getInt("groupid")));
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}  
-		
-			
+		}  	
+		return result;
+	}
+	public List<Topic> getAllTopicByGroupId(int id)  {
+		try {
+			Statement stmt=con.createStatement();
+			String sql = "select * from DONGHUNG.topic WHERE groupid = "+id;
+			ResultSet rs=stmt.executeQuery(sql);
+			result = new ArrayList<Topic>();
+			while(rs.next()) {
+				result.add(new Topic(rs.getString("id"),rs.getString("name"),rs.getString("description"),rs.getInt("groupid")));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}  	
 		return result;
 	}
 	public Topic getTopic(String id) {
@@ -41,7 +50,7 @@ public class TopicModel {
 			String sql = "select * from DONGHUNG.topic WHERE id = '"+id+"'";
 			ResultSet rs=stmt.executeQuery(sql);
 			rs.next();
-			t = new Topic(rs.getString("id"),rs.getString("name"),rs.getString("description"));
+			t = new Topic(rs.getString("id"),rs.getString("name"),rs.getString("description"),rs.getInt("groupid"));
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -53,7 +62,7 @@ public class TopicModel {
 	public void addTopic (Topic topic) {
 		try {
 			Statement stmt=con.createStatement();
-			String sql = "INSERT INTO DONGHUNG.TOPIC(id,name,description) VALUES('"+topic.getId()+"','"+topic.getName()+"','"+topic.getDescription()+"')";
+			String sql = "INSERT INTO DONGHUNG.TOPIC(id,name,description,groupid) VALUES('"+topic.getId()+"','"+topic.getName()+"','"+topic.getDescription()+"',"+topic.getGroupid()+")";
 			stmt.execute(sql);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -63,7 +72,7 @@ public class TopicModel {
 	public void updateTopic(Topic topic) {
 		try {
 			Statement stmt=con.createStatement();
-			String sql = "UPDATE DONGHUNG.TOPIC SET name = '"+topic.getName()+"',description = '"+topic.getDescription()+"' WHERE id = '"+topic.getId()+"'";
+			String sql = "UPDATE DONGHUNG.TOPIC SET name = '"+topic.getName()+"',description = '"+topic.getDescription()+"' groupid = "+topic.getGroupid()+" WHERE id = '"+topic.getId()+"'";
 			stmt.execute(sql);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

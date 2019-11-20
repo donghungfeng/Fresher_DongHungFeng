@@ -45,4 +45,12 @@ public class TopicController {
 		topicModel.deleteTopic(id);
 		return "Delete success!";
 	}
+	
+	@CrossOrigin(origins = "http://localhost:3000")
+	@RequestMapping("/topic/getbygroupid/{id}")
+	private List<Topic> getTopicByGroupId(@PathVariable int id) {
+		if(id==0)
+			return topicModel.getAllTopics();
+		return topicModel.getAllTopicByGroupId(id);
+	}
 }
