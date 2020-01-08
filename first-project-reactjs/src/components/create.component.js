@@ -15,7 +15,7 @@ export default class Create extends Component {
             id: '',
             name: '',
             description:'',
-            topicgroupid:0,
+            groupid:0,
             grouptopics: []
         }
     }
@@ -58,27 +58,30 @@ export default class Create extends Component {
 
     handleOnSelChange(e){
        this.setState({
-            topicgroupid:e.target.value
+            groupid:e.target.value
        });
     }
 
     onSubmit(e) {
         e.preventDefault();
 
+        if(this.state.groupid == 0){
+            alert("Chọn 1 nhóm");
+            return ;
+        }
         const obj = {
             id: this.state.id,
             name: this.state.name,
             description: this.state.description,
-            groupid: this.state.topicgroupid,
+            groupid: this.state.groupid
         };
         axios.post('http://localhost:8082/topic/add', obj)
             .then(res => console.log(res.data));
-
         this.setState({
             id: '',
             name: '',
             description: '',
-            topicgroupid: 0
+            groupid: 0
         });
 
         this.props.history.push('/index');
@@ -106,13 +109,13 @@ export default class Create extends Component {
                     <div className="form-group">
                         <label>Group: </label>
                         <select className="form-control" onChange={this.handleOnSelChange}>
+                        <option value="0">--Chọn nhóm--</option>
                         {this.selOption()}
                         </select>
                     </div>
                     <div className="form-group">
                         <input type="submit" value="Add Topic" className="btn btn-primary"/>
                     </div>
-                    
                 </form>
             </div>
         )

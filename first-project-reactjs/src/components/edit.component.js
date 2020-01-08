@@ -67,7 +67,6 @@ export default class Edit extends Component {
 			description:this.state.description,
 			groupid:this.state.groupid
 		}
-		alert(this.state.groupid);
 		axios({
 			method: 'post',
 			url: 'http://localhost:8082/topic/update',

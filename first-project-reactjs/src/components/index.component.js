@@ -48,13 +48,47 @@ export default class Index extends Component {
             });
     }
 
+    handleOnTypeSearch(e){
+        if(e.target.value == ""){
+
+            axios.get('http://localhost:8082/topics')
+            .then(response => {
+                console.log(response.data);
+                this.setState({topics: response.data});
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+            return
+        }
+         axios.get('http://localhost:8082/topics/searchbyname/'+e.target.value)
+            .then(response => {
+                console.log(response.data);
+                this.setState({topics: response.data});
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
     render() {
         return (
-            <div>
-                <select className="form-control col-md-3" onChange={this.handleOnSelChange.bind(this)}>
-                <option value="0" selected>Get all</option>
-                {this.selOption()}
-                </select>
+            <div className="row">
+                <div className="col-md-1">
+                    <h6>Chọn nhóm</h6>
+                </div>
+                <div className="col-md-3">
+                    <select className="form-control" onChange={this.handleOnSelChange.bind(this)}>
+                    <option value="0" selected>Get all</option>
+                    {this.selOption()}
+                    </select>
+                </div>
+                <div className="col-md-1">
+                    <h6>Tìm kiếm</h6>
+                </div>
+                <div className="col-md-7">
+                    <input type="text" className="form-control" onChange={this.handleOnTypeSearch.bind(this)}/>
+                </div>
                 <h3 align="center">Topics List</h3>
                 <table className="table table-striped" style={{marginTop: 20}}>
                     <thead>
