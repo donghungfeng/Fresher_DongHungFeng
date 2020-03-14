@@ -14,9 +14,22 @@ public class TopicController {
 	private TopicModel topicModel;
 	
 	@CrossOrigin(origins = "http://localhost:3000")
+	@RequestMapping("/datasource/{db}")
+	private String getGroupTopic(@PathVariable String db) {
+		topicModel = new TopicModel(db);
+		return "Switch to "+db;
+	}
+	
+	@CrossOrigin(origins = "http://localhost:3000")
 	@RequestMapping(value="/topics")
 	private List<Topic> getAllTopics() {
-		return topicModel.getAllTopics();
+		return topicModel.getAllTopics("");
+	}
+	
+	@CrossOrigin(origins = "http://localhost:3000")
+	@RequestMapping(value="/topics/searchbyname/{name}")
+	private List<Topic> getAllTopics(@PathVariable String name) {
+		return topicModel.getAllTopics(name);
 	}
 	
 	@CrossOrigin(origins = "http://localhost:3000")
@@ -28,8 +41,7 @@ public class TopicController {
 	@CrossOrigin(origins = "http://localhost:3000")
 	@RequestMapping("/topic/add")
 	private String addTopic(@RequestBody Topic topic) {
-		topicModel.addTopic(topic);
-		return "Add success!";
+		return topicModel.addTopic(topic);
 	}
 	
 	@CrossOrigin(origins = "http://localhost:3000")
@@ -43,14 +55,15 @@ public class TopicController {
 	@RequestMapping("/topic/delete/{id}")
 	private String deleteTopic(@PathVariable String id) {
 		topicModel.deleteTopic(id);
-		return "Delete success!";
+		return "";
+		
 	}
 	
 	@CrossOrigin(origins = "http://localhost:3000")
 	@RequestMapping("/topic/getbygroupid/{id}")
 	private List<Topic> getTopicByGroupId(@PathVariable int id) {
 		if(id==0)
-			return topicModel.getAllTopics();
+			return topicModel.getAllTopics("");
 		return topicModel.getAllTopicByGroupId(id);
 	}
 }
