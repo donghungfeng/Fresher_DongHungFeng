@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import axios from 'axios';
 import TableRow from './TableRow';
 import SelGroupTopic from './SelGroupTopic';
+const url = "http://localhost:8084";
 
 export default class Index extends Component {
     constructor(props) {
@@ -9,7 +10,7 @@ export default class Index extends Component {
         this.state = {topics: [],grouptopics: []};
     }
     componentDidMount() {
-        axios.get('http://localhost:8082/topics')
+        axios.get(url+'/topics')
             .then(response => {
                 console.log(response.data);
                 this.setState({topics: response.data});
@@ -17,7 +18,7 @@ export default class Index extends Component {
             .catch(function (error) {
                 console.log(error);
             });
-        axios.get('http://localhost:8082/grouptopics')
+        axios.get(url+'/grouptopics')
             .then(response => {
                 console.log(response.data);
                 this.setState({grouptopics: response.data});
@@ -38,7 +39,25 @@ export default class Index extends Component {
         });
     }
     handleOnSelChange(e){
-        axios.get('http://localhost:8082/topic/getbygroupid/'+e.target.value)
+        axios.get(url+'/topic/getbygroupid/'+e.target.value)
+            .then(response => {
+                console.log(response.data);
+                this.setState({topics: response.data});
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+    handleOnSelDBChange(e){
+        axios.get(url+'/datasource/'+e.target.value)
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+        axios.get(url+'/topics')
             .then(response => {
                 console.log(response.data);
                 this.setState({topics: response.data});
@@ -49,9 +68,9 @@ export default class Index extends Component {
     }
 
     handleOnTypeSearch(e){
-        if(e.target.value == ""){
+        if(e.target.value === ""){
 
-            axios.get('http://localhost:8082/topics')
+            axios.get(url+'/topics')
             .then(response => {
                 console.log(response.data);
                 this.setState({topics: response.data});
@@ -61,7 +80,7 @@ export default class Index extends Component {
             });
             return
         }
-         axios.get('http://localhost:8082/topics/searchbyname/'+e.target.value)
+         axios.get(url+'/topics/searchbyname/'+e.target.value)
             .then(response => {
                 console.log(response.data);
                 this.setState({topics: response.data});
@@ -74,6 +93,20 @@ export default class Index extends Component {
     render() {
         return (
             <div className="row">
+                 <div className="col-md-1">
+                    <h6>Chọn DB</h6>
+                </div>
+                <div className="col-md-3">
+                    <select className="form-control" onChange={this.handleOnSelDBChange.bind(this)}>
+                        <option value="oracle">Oracle</option>
+                        <option value="sqlite">Sqlite</option>
+                    </select>
+                </div>
+                 <div className="col-md-8">
+                    
+                </div>
+                <br />
+                <br />
                 <div className="col-md-1">
                     <h6>Chọn nhóm</h6>
                 </div>

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import SelGroupTopic from './SelGroupTopic'
+const url = "http://localhost:8084";
 
 export default class Edit extends Component {
 	constructor(props) {
@@ -20,7 +21,7 @@ export default class Edit extends Component {
 	}
 
 	componentDidMount() {
-		axios.get('http://localhost:8082/topics/'+this.props.match.params.id)
+		axios.get(url+'/topics/'+this.props.match.params.id)
 		.then(response => {
 			this.setState({
 				id: response.data.id,
@@ -31,7 +32,7 @@ export default class Edit extends Component {
 		.catch(function (error) {
 			console.log(error);
 		});
-		axios.get('http://localhost:8082/grouptopics/')
+		axios.get(url+'/grouptopics/')
 		.then(response => {
 			this.setState({
 				grouptopics:response.data});
@@ -60,7 +61,6 @@ export default class Edit extends Component {
 	onSubmit(e) {
 		e.preventDefault();
 		axios.get(url).then(response => console.log(response.data));
-		var url = '';
 		var body = {
 			id:this.state.id,
 			name:this.state.name,
@@ -69,7 +69,7 @@ export default class Edit extends Component {
 		}
 		axios({
 			method: 'post',
-			url: 'http://localhost:8082/topic/update',
+			url: 'http://localhost:8084/topic/update',
 			data: body
 		})
 		this.props.history.push('/index');
