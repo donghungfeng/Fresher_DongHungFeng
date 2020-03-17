@@ -4,11 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ import entities.Posterminal;
 @Service
 public class PosterminalService {
 	
-	//private static final Logger logger = (Logger) LoggerFactory.getLogger(POSTERMINALService.class);
+	private static final Logger logger = LoggerFactory.getLogger(PosterminalService.class);
 	private List<Posterminal> result = new ArrayList<Posterminal>();
 	private Connection con = ConnectSqlite.getConnection();
 	
@@ -39,7 +38,7 @@ public class PosterminalService {
 				result.add(new Posterminal(rs.getInt("posterminalid"),rs.getString("code"),rs.getString("name"),rs.getString("ipaddress"),rs.getInt("status")));
 			}
 		} catch (Exception e) {
-			
+			logger.error("PosterminalService.getAll | " + e.getMessage());
 		}  	
 		return result;
 	}
@@ -52,13 +51,15 @@ public class PosterminalService {
 			rs.next();
 			t = new Posterminal(rs.getInt("posterminalid"),rs.getString("code"),rs.getString("name"),rs.getString("ipaddress"),rs.getInt("status"));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("PosterminalService.getbyid | " + e.getMessage());
 		}  
 		return t;
 	}
 	public int save (Posterminal posterminal) {
-		if(posterminal.getName()==null || posterminal.getCode()==null || posterminal.getCode()==null)
+		if(posterminal.getName()==null || posterminal.getCode()==null || posterminal.getIpaddress()==null) {
+			logger.error("PosterminalService.save | name,code,ipaddress not null");
 			return 99;
+		}
 		try {
 			if(posterminal.getPosterminalid() == 0) {
 				PreparedStatement stmt = con.prepareStatement(SQL_INSERT);
@@ -79,8 +80,7 @@ public class PosterminalService {
 			}
 			return 0;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			
+			logger.error("PosterminalService.save | " + e.getMessage());
 			return 99;
 		} 
 	}
@@ -91,8 +91,7 @@ public class PosterminalService {
 			stmt.executeUpdate();
 			return 0;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			
+			logger.error("PosterminalService.delete | " + e.getMessage());
 			return 99;
 		} 
 	}

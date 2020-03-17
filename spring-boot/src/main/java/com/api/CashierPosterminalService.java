@@ -4,23 +4,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import Connection.ConnectSqlite;
-import entities.Cashier;
 import entities.CashierPosterminal;
 
 
 @Service
 public class CashierPosterminalService {
 	
-	//private static final Logger logger = (Logger) LoggerFactory.getLogger(CashierService.class);
+	private static final Logger logger = (Logger) LoggerFactory.getLogger(CashierPosterminalService.class);
 	private List<CashierPosterminal> result = new ArrayList<CashierPosterminal>();
 	private Connection con = ConnectSqlite.getConnection();
 	
@@ -39,7 +37,7 @@ public class CashierPosterminalService {
 				result.add(new CashierPosterminal(rs.getInt("cashierid"),rs.getInt("posterminalid")));
 			}
 		} catch (Exception e) {
-			
+			logger.error("CashierPosterminalService.getAll | " + e.getMessage());
 		}  	
 		return result;
 	}
@@ -53,7 +51,7 @@ public class CashierPosterminalService {
 				result.add(new CashierPosterminal(rs.getInt("cashierid"),rs.getInt("posterminalid")));
 			}
 		} catch (Exception e) {
-			
+			logger.error("CashierPosterminalService.getByCashierid | " + e.getMessage());
 		}  	
 		return result;
 	}
@@ -67,14 +65,16 @@ public class CashierPosterminalService {
 				result.add(new CashierPosterminal(rs.getInt("cashierid"),rs.getInt("posterminalid")));
 			}
 		} catch (Exception e) {
-			
+			logger.error("CashierPosterminalService.getByPosterminalid | " + e.getMessage());
 		}  	
 		return result;
 	}
 	
 	public int save (CashierPosterminal cashier) {
-		if(cashier.getCashierid()==0 || cashier.getPosterminalid()==0)
+		if(cashier.getCashierid()==0 || cashier.getPosterminalid()==0) {
+			logger.error("CashierPosterminalService.save | cashierid, posterminalid not null");
 			return 99;
+		}
 		try {
 			
 			PreparedStatement stmt = con.prepareStatement(SQL_INSERT);
@@ -85,13 +85,11 @@ public class CashierPosterminalService {
 			return 0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			
+			logger.error("CashierPosterminalService.save | " + e.getMessage());
 			return 99;
 		} 
 	}
 	public int delete (CashierPosterminal cashier) {
-		if(cashier.getCashierid()==0 || cashier.getPosterminalid()==0)
-			return 99;
 		try {
 			
 			PreparedStatement stmt = con.prepareStatement(SQL_DELETE);
@@ -102,7 +100,7 @@ public class CashierPosterminalService {
 			return 0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			
+			logger.error("CashierPosterminalService.getAll | " + e.getMessage());
 			return 99;
 		} 
 	}

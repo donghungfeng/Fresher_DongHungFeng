@@ -4,11 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ import entities.Cashier;
 @Service
 public class CashierService {
 	
-	//private static final Logger logger = (Logger) LoggerFactory.getLogger(CashierService.class);
+	private static final Logger logger = LoggerFactory.getLogger(CashierService.class);
 	private List<Cashier> result = new ArrayList<Cashier>();
 	private Connection con = ConnectSqlite.getConnection();
 	
@@ -39,7 +38,7 @@ public class CashierService {
 				result.add(new Cashier(rs.getInt("cashierid"),rs.getString("code"),rs.getString("name"),rs.getString("ipaddress"),rs.getInt("status")));
 			}
 		} catch (Exception e) {
-			
+			logger.error("TopicService.getAll | " + e.getMessage());
 		}  	
 		return result;
 	}
@@ -52,13 +51,15 @@ public class CashierService {
 			rs.next();
 			t = new Cashier(rs.getInt("cashierid"),rs.getString("code"),rs.getString("name"),rs.getString("ipaddress"),rs.getInt("status"));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("TopicService.getById | " + e.getMessage());
 		}  
 		return t;
 	}
 	public int save (Cashier cashier) {
-		if(cashier.getName()==null || cashier.getCode()==null || cashier.getCode()==null)
+		if(cashier.getName()==null || cashier.getCode()==null || cashier.getIpaddress()==null) {
+			logger.error("TopicService.save - name, code, ipaddress not null");
 			return 99;
+		}
 		try {
 			if(cashier.getCashierid() == 0) {
 				PreparedStatement stmt = con.prepareStatement(SQL_INSERT);
@@ -79,8 +80,7 @@ public class CashierService {
 			}
 			return 0;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			
+			logger.error("TopicService.save | " + e.getMessage());
 			return 99;
 		} 
 	}
@@ -91,8 +91,7 @@ public class CashierService {
 			stmt.executeUpdate();
 			return 0;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			
+			logger.error("TopicService.delete | " + e.getMessage());
 			return 99;
 		} 
 	}

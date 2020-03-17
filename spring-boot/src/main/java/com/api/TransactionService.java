@@ -4,23 +4,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import Connection.ConnectSqlite;
-import entities.Cashier;
 import entities.Transaction;
 
 
 @Service
 public class TransactionService {
 	
-	//private static final Logger logger = (Logger) LoggerFactory.getLogger(CashierService.class);
+	private static final Logger logger = (Logger) LoggerFactory.getLogger(TransactionService.class);
 	private List<Transaction> result = new ArrayList<Transaction>();
 	private Connection con = ConnectSqlite.getConnection();
 	
@@ -39,7 +37,7 @@ public class TransactionService {
 				result.add(new Transaction(rs.getInt("transactionid"),rs.getInt("cashierid"),rs.getInt("posterminalid"),rs.getString("amount"),rs.getString("posrequestdate"),rs.getString("posresponsedate"),rs.getString("token"),rs.getString("req_metadata"),rs.getString("resp_metadata"),rs.getString("resp_code"),rs.getString("resp_message"),rs.getInt("status")));
 			}
 		} catch (Exception e) {
-			
+			logger.error("TransactionService.getAll | " + e.getMessage());
 		}  	
 		return result;
 	}
@@ -52,13 +50,15 @@ public class TransactionService {
 			rs.next();
 			t = new Transaction(rs.getInt("transactionid"),rs.getInt("cashierid"),rs.getInt("posterminalid"),rs.getString("amount"),rs.getString("posrequestdate"),rs.getString("posresponsedate"),rs.getString("token"),rs.getString("req_metadata"),rs.getString("resp_metadata"),rs.getString("resp_code"),rs.getString("resp_message"),rs.getInt("status"));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("TransactionService.getbyid | " + e.getMessage());
 		}  
 		return t;
 	}
 	public int save (Transaction transaction) {
-		if(transaction.getCashierid()==0|| transaction.getPosterminalid()==0 || transaction.getAmount()==null||transaction.getPosrequestdate()==null||transaction.getPosresponsedate()==null||transaction.getResp_code()==null||transaction.getToken()==null)
+		if(transaction.getCashierid()==0|| transaction.getPosterminalid()==0 || transaction.getAmount()==null||transaction.getPosrequestdate()==null||transaction.getPosresponsedate()==null||transaction.getResp_code()==null||transaction.getToken()==null) {
+			logger.error("TransactionService.save |cashierid, posterminal, amount, posrequestdate, posresponsedate, resp_code,token not null");
 			return 99;
+		}
 		try {
 			if(transaction.getCashierid() == 0) {
 				PreparedStatement stmt = con.prepareStatement(SQL_INSERT);
@@ -93,8 +93,7 @@ public class TransactionService {
 			}
 			return 0;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			
+			logger.error("TransactionService.save | " + e.getMessage());
 			return 99;
 		} 
 	}
@@ -105,8 +104,7 @@ public class TransactionService {
 			stmt.executeUpdate();
 			return 0;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			
+			logger.error("TransactionService.delete | " + e.getMessage());
 			return 99;
 		} 
 	}

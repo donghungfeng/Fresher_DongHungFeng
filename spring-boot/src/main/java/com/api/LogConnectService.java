@@ -4,23 +4,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import Connection.ConnectSqlite;
-import entities.Cashier;
 import entities.LogConnect;
 
 
 @Service
 public class LogConnectService {
 	
-	//private static final Logger logger = (Logger) LoggerFactory.getLogger(CashierService.class);
+	private static final Logger logger = LoggerFactory.getLogger(LogConnectService.class);
 	private List<LogConnect> result = new ArrayList<LogConnect>();
 	private Connection con = ConnectSqlite.getConnection();
 	
@@ -39,7 +37,7 @@ public class LogConnectService {
 				result.add(new LogConnect(rs.getInt("id"),rs.getString("type"),rs.getString("createdate"),rs.getString("sourceip"),rs.getString("destinationip"),rs.getString("metadata")));
 			}
 		} catch (Exception e) {
-			
+			logger.error("LogConnectService.getAll | " + e.getMessage());
 		}  	
 		return result;
 	}
@@ -52,13 +50,15 @@ public class LogConnectService {
 			rs.next();
 			t = new LogConnect(rs.getInt("id"),rs.getString("type"),rs.getString("createdate"),rs.getString("sourceip"),rs.getString("destinationip"),rs.getString("metadata"));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("LogConnectService.getById | " + e.getMessage());
 		}  
 		return t;
 	}
 	public int save (LogConnect logConnect) {
-		if(logConnect.getType()==null || logConnect.getCreatedate()==null || logConnect.getSourceip()==null || logConnect.getDestinationip()==null)
+		if(logConnect.getType()==null || logConnect.getCreatedate()==null || logConnect.getSourceip()==null || logConnect.getDestinationip()==null) {
+			logger.error("LogConnectService.save | type, createdate, soucrceip, destinationip not null");
 			return 99;
+		}
 		try {
 			if(logConnect.getId()== 0) {
 				PreparedStatement stmt = con.prepareStatement(SQL_INSERT);
@@ -81,8 +81,7 @@ public class LogConnectService {
 			}
 			return 0;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			
+			logger.error("LogConnectService.save | " + e.getMessage());
 			return 99;
 		} 
 	}
@@ -93,7 +92,7 @@ public class LogConnectService {
 			stmt.executeUpdate();
 			return 0;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			logger.error("LogConnectService.delete | " + e.getMessage());
 			return 99;
 		} 
 	}
