@@ -23,10 +23,10 @@ public class TransactionService {
 	private Connection con = ConnectSqlite.getConnection();
 	
 	private String SQL_GETALL = "SELECT * FROM TRANSACTION";
-	private String SQL_GETBYID = "SELECT * FROM TRANSACTION WHERE transactionid = ?";
-	private String SQL_INSERT = "INSERT INTO TRANSACTION(cashierid,posterminalid,amount,posrequestdate,posresponsedate,token,req_metadata,resp_metadata,resp_code,resp_message,status) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
-	private String SQL_UPDATE = "UPDATE TRANSACTION SET cashierid = ?, posterminalid = ?, amount=?, posrequestdate = ?, posresponsedate = ?, req_metadata = ?, resp_metadata = ?, resp_code = ?, resp_message = ?, status = ? WHERE transactionid = ?";
-	private String SQL_DELETE = "DELETE FROM TRANSACTION WHERE transactionid = ?";
+	private String SQL_GETBYID = "SELECT * FROM TRANSACTION WHERE requestid = ?";
+	private String SQL_INSERT = "INSERT INTO TRANSACTION(requestid,transtype,cardno,amount,stan,time,expiredate,refno,approvalcode,returncode,tid,mid,currencycode,batchno,receiptno,cardtype,cardholder,cardinput,emvappname,emvaid,emvtc,posserial,transname,transstatus,clientid) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	private String SQL_UPDATE = "UPDATE TRANSACTION SET transtype = ?, cardno = ?, amount=?, stan = ?, time = ?, expiredate = ?, refno = ?, approvalcode = ?, returncode = ?, tid = ?, mid = ?, currencycode = ?, batchno = ?, receiptno = ?, cardtype = ?, cardholder = ?, cardinput = ?, emvappname = ?, emvaid = ?, emvtc = ?, posserial = ?, transname = ?, transstatus = ?, clientid = ? WHERE requestid = ?";
+	private String SQL_DELETE = "DELETE FROM TRANSACTION WHERE requestid = ?";
 	
 	public List<Transaction> getAll()  {
 		try {
@@ -34,7 +34,7 @@ public class TransactionService {
 			ResultSet rs=stmt.executeQuery();
 			result = new ArrayList<Transaction>();
 			while(rs.next()) {
-				result.add(new Transaction(rs.getInt("transactionid"),rs.getInt("cashierid"),rs.getInt("posterminalid"),rs.getString("amount"),rs.getString("posrequestdate"),rs.getString("posresponsedate"),rs.getString("token"),rs.getString("req_metadata"),rs.getString("resp_metadata"),rs.getString("resp_code"),rs.getString("resp_message"),rs.getInt("status")));
+				result.add(new Transaction(rs.getInt("requestid"),rs.getString("transtype"),rs.getString("cardno"),rs.getString("amount"),rs.getString("stan"),rs.getString("time"),rs.getString("expiredate"),rs.getString("refno"),rs.getString("approvalcode"),rs.getString("returncode"),rs.getString("tid"),rs.getString("mid"),rs.getString("currencycode"),rs.getString("batchno"),rs.getString("receiptno"),rs.getString("cardtype"),rs.getString("cardholder"),rs.getString("cardinput"),rs.getString("emvappname"),rs.getString("emvaid"),rs.getString("emvtc"),rs.getString("posserial"),rs.getString("transname"),rs.getString("transstatus"),rs.getString("clientid")));
 			}
 		} catch (Exception e) {
 			logger.error("TransactionService.getAll | " + e.getMessage());
@@ -48,47 +48,76 @@ public class TransactionService {
 			stmt.setInt(1, id);
 			ResultSet rs=stmt.executeQuery();
 			rs.next();
-			t = new Transaction(rs.getInt("transactionid"),rs.getInt("cashierid"),rs.getInt("posterminalid"),rs.getString("amount"),rs.getString("posrequestdate"),rs.getString("posresponsedate"),rs.getString("token"),rs.getString("req_metadata"),rs.getString("resp_metadata"),rs.getString("resp_code"),rs.getString("resp_message"),rs.getInt("status"));
+			t = new Transaction(rs.getInt("requestid"),rs.getString("transtype"),rs.getString("cardno"),rs.getString("amount"),rs.getString("stan"),rs.getString("time"),rs.getString("expiredate"),rs.getString("refno"),rs.getString("approvalcode"),rs.getString("returncode"),rs.getString("tid"),rs.getString("mid"),rs.getString("currencycode"),rs.getString("batchno"),rs.getString("receiptno"),rs.getString("cardtype"),rs.getString("cardholder"),rs.getString("cardinput"),rs.getString("emvappname"),rs.getString("emvaid"),rs.getString("emvtc"),rs.getString("posserial"),rs.getString("transname"),rs.getString("transstatus"),rs.getString("clientid"));
 		} catch (Exception e) {
 			logger.error("TransactionService.getbyid | " + e.getMessage());
 		}  
 		return t;
 	}
 	public int save (Transaction transaction) {
-		if(transaction.getCashierid()==0|| transaction.getPosterminalid()==0 || transaction.getAmount()==null||transaction.getPosrequestdate()==null||transaction.getPosresponsedate()==null||transaction.getResp_code()==null||transaction.getToken()==null) {
-			logger.error("TransactionService.save |cashierid, posterminal, amount, posrequestdate, posresponsedate, resp_code,token not null");
+		if(transaction.getAmount()==null) {
+			logger.error("TransactionService.save |Not null");
 			return 99;
 		}
 		try {
-			if(transaction.getCashierid() == 0) {
+			if(transaction.getRequestid() == 0) {
 				PreparedStatement stmt = con.prepareStatement(SQL_INSERT);
-				stmt.setInt(1, transaction.getCashierid());
-				stmt.setInt(2, transaction.getPosterminalid());
-				stmt.setString(3, transaction.getAmount());
-				stmt.setString(4, transaction.getPosrequestdate());
-				stmt.setString(5, transaction.getPosresponsedate());
-				stmt.setString(6, transaction.getToken());
-				stmt.setString(7, transaction.getReq_metadata());
-				stmt.setString(8, transaction.getResp_metadata());
-				stmt.setString(9, transaction.getResp_code());
-				stmt.setString(10, transaction.getResp_message());
-				stmt.setInt(11, transaction.getStatus());
+				stmt.setInt(1, transaction.getRequestid());
+				stmt.setString(2, transaction.getTranstype());
+				stmt.setString(3, transaction.getCardno());
+				stmt.setString(4, transaction.getAmount());
+				stmt.setString(5, transaction.getStan());
+				stmt.setString(6, transaction.getTime());
+				stmt.setString(7, transaction.getExpiredate());
+				stmt.setString(8, transaction.getRefno());
+				stmt.setString(9, transaction.getApprovalcode());
+				stmt.setString(10, transaction.getReturncode());
+				stmt.setString(11, transaction.getTid());
+				stmt.setString(12, transaction.getMid());
+				stmt.setString(13, transaction.getCurrencycode());
+				stmt.setString(14, transaction.getBatchno());
+				stmt.setString(15, transaction.getReceiptno());
+				stmt.setString(16, transaction.getCardtype());
+				stmt.setString(17, transaction.getCardholder());
+				stmt.setString(18, transaction.getCardinput());
+				stmt.setString(19, transaction.getEmvappname());
+				stmt.setString(20, transaction.getEmvaid());
+				stmt.setString(21, transaction.getEmvtc());
+				stmt.setString(22, transaction.getPosserial());
+				stmt.setString(23, transaction.getTransname());
+				stmt.setString(24, transaction.getTransstatus());
+				stmt.setString(25, transaction.getClientid());
+				
 				stmt.executeUpdate();
 			}
 			else {
 				PreparedStatement stmt = con.prepareStatement(SQL_UPDATE);
-				stmt.setInt(1, transaction.getCashierid());
-				stmt.setInt(2, transaction.getPosterminalid());
+				stmt.setString(1, transaction.getTranstype());
+				stmt.setString(2, transaction.getCardno());
 				stmt.setString(3, transaction.getAmount());
-				stmt.setString(4, transaction.getPosrequestdate());
-				stmt.setString(5, transaction.getPosresponsedate());
-				stmt.setString(6, transaction.getToken());
-				stmt.setString(7, transaction.getReq_metadata());
-				stmt.setString(8, transaction.getResp_metadata());
-				stmt.setString(9, transaction.getResp_code());
-				stmt.setString(10, transaction.getResp_message());
-				stmt.setInt(11, transaction.getStatus());
-				stmt.setInt(12, transaction.getTransactionid());
+				stmt.setString(4, transaction.getStan());
+				stmt.setString(5, transaction.getTime());
+				stmt.setString(6, transaction.getExpiredate());
+				stmt.setString(7, transaction.getRefno());
+				stmt.setString(8, transaction.getApprovalcode());
+				stmt.setString(9, transaction.getReturncode());
+				stmt.setString(10, transaction.getTid());
+				stmt.setString(11, transaction.getMid());
+				stmt.setString(12, transaction.getCurrencycode());
+				stmt.setString(13, transaction.getBatchno());
+				stmt.setString(14, transaction.getReceiptno());
+				stmt.setString(15, transaction.getCardtype());
+				stmt.setString(16, transaction.getCardholder());
+				stmt.setString(17, transaction.getCardinput());
+				stmt.setString(18, transaction.getEmvappname());
+				stmt.setString(19, transaction.getEmvaid());
+				stmt.setString(20, transaction.getEmvtc());
+				stmt.setString(21, transaction.getPosserial());
+				stmt.setString(22, transaction.getTransname());
+				stmt.setString(23, transaction.getTransstatus());
+				stmt.setString(24, transaction.getClientid());
+				
+				stmt.setInt(25, transaction.getRequestid());
 				stmt.executeUpdate();
 			}
 			return 0;
